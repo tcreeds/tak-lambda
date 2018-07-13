@@ -4,8 +4,9 @@ AWS.config.update({region: 'us-east-1'});
 const dynamo = new AWS.DynamoDB({region: 'us-east-1', apiVersion: '2012-08-10'})
 
 module.exports.handler = (request, context, callback) => {
+  console.log(request)
   const requestParams = {
-    Key: { 'username': {S: request.username}},
+    Key: { 'username': {S: request.queryStringParameters.username}},
     TableName: 'tak'
   }
   dynamo.getItem(requestParams).promise().then((data) => {

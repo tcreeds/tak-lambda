@@ -1,5 +1,7 @@
-rm index.zip 
-cd $1
-zip –X –r ../index.zip ./*
-cd .. 
-aws lambda update-function-code --function-name tak-$1 --zip-file fileb://index.zip
+#!/bin/bash
+
+rm index.zip
+cd get
+zip -r ../index.zip *
+cd ..
+aws lambda update-function-code --function-name tak-get --zip-file fileb://index.zip
