@@ -1,5 +1,11 @@
 let { handler } = require('./app.js')
 
-handler({ username: 'tcreeds' }, {}, (sumtin, res) => {
+let testData = { 
+    queryStringParameters: {
+        username: 'bonkers' 
+    }
+}
+
+handler(testData, {}, (sumtin, res) => {
     console.log(res)
 })

@@ -1,47 +1,29 @@
 var AWS = require('aws-sdk');
 AWS.config.update({region: 'us-east-1'});
 
-const dynamo = new AWS.DynamoDB({region: 'us-east-1', apiVersion: '2012-08-10'})
+const dynamo = new AWS.DynamoDB.DocumentClient()
 
 module.exports.handler = (request, context, callback) => {
+  let body = JSON.parse(request.body)
   const requestParams = {
-    Key: { 'username': {S: request.username}},
+    Key: { 'username': body.username },
+    UpdateExpression: "set tasks = :t, viewList = :v",
+    ExpressionAttributeValues: {
+      ":t": body.tasks,
+      ":v": body.views
+    },
+    ReturnValues: "UPDATED_NEW",
     TableName: 'tak'
   }
-  dynamo.putItem(requestParams).promise().then((data) => {
-    const readable = toReadableJson(data)
-    const response = generateResponse(readable)
+  dynamo.update(requestParams).promise().then((data) => {
+    const response = generateResponse(data)
     callback(null, response)
+  }).catch(res => {
+    console.log(res)
+    callback(null, res.message)
   })
   
 };
-
-function toReadableJson(data){
-  let tasks = data.Item.tasks.L.map(task => {
-    return {
-      id: task.M.id.S,
-      name: task.M.name.S,
-      state: task.M.state.S,
-      tags: task.M.tags.L.map(tag => {
-        return {
-          type: tag.M.type.S,
-          value: tag.M.value.S
-        }
-      })
-    }
-  })
-  let views = data.Item.views.L.map(view => {
-    return {
-      filter: view.M.filter.S,
-      name: view.M.name.S
-    }
-  })
-  return {
-    tasks: tasks,
-    views: views,
-    username: data.Item.username.S
-  }
-}
 
 function generateResponse(data){
   const response = {

@@ -31,7 +31,8 @@ function toReadableJson(data){
       })
     }
   })
-  let views = data.Item.views.L.map(view => {
+  let viewList = data.Item.viewList ? data.Item.viewList : data.Item.views
+  let views = viewList.L.map(view => {
     return {
       filter: view.M.filter.S,
       name: view.M.name.S
